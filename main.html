@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Info HIV/AIDS & NAPSZA</title>
+    
+    <!-- Memuat Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Memuat Google Font (Inter) --><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Kustom CSS untuk Animasi dan Gaya --><style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* HAPUS background-color dan background-image lama */
+            /* background-color: #f7fafc; */
+            /* background-image: url("data:image/svg+xml,..."); */
+
+            /* TAMBAHKAN background gradient baru */
+            background: linear-gradient(to bottom, #d1f0ff 0%, #e8f8e7 100%);
+            background-attachment: fixed; /* Membuat background diam saat di-scroll */
+        }
+
+        /* 1. Animasi untuk Accordion (Info Buka-Tutup) */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        /* 2. Animasi untuk Elemen yang Muncul Saat Scroll */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .animate-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 3. Animasi 'Pulse' Halus untuk Judul Hero */
+        @keyframes subtle-pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.9;
+            }
+        }
+        .hero-title-pulse {
+            animation: subtle-pulse 3s infinite;
+        }
+
+        /* 4. Animasi untuk Ikon Accordion */
+        .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+        .accordion-button.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* 5. Gradient Teks untuk Judul (Opsional tapi keren) */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        /* 6. Background Overlay dengan Ilustrasi Virus HIV */
+        .virus-bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Agar tidak menghalangi interaksi */
+            opacity: 0.05; /* Sangat transparan */
+            background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3e%3ccircle cx="50" cy="50" r="45" fill="%23ef4444"/%3e%3ccircle cx="50" cy="50" r="30" fill="%23dc2626"/%3e%3cpath d="M50 5 L55 15 L45 15 Z" fill="%23b91c1c"/%3e%3cpath d="M50 95 L55 85 L45 85 Z" fill="%23b91c1c"/%3e%3cpath d="M5 50 L15 55 L15 45 Z" fill="%23b91c1c"/%3e%3cpath d="M95 50 L85 55 L85 45 Z" fill="%23b91c1c"/%3e%3c/svg%3e'); /* Ilustrasi virus sederhana */
+            background-size: 150px; /* Ukuran ilustrasi virus */
+            background-repeat: repeat;
+            animation: virus-float 30s linear infinite; /* Animasi bergerak lambat */
+            z-index: -1;
+        }
+
+        @keyframes virus-float {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Mode Anak Styling */
+        body.kids-mode {
+            /* HAPUS background-color dan background-image lama */
+            /* background-color: #e0f2f7; */
+            /* background-image: url("data:image/svg+xml,..."); */
+
+            /* TAMBAHKAN background gradient baru untuk Mode Anak */
+            background: linear-gradient(to bottom, #c0e8f9 0%, #e0f8de 100%);
+            background-attachment: fixed;
+        }
+
+        .kids-mode .hero-title-pulse {
+             animation: none; /* Hentikan pulse di mode anak */
+             color: #0d88b4 !important; /* Warna teks lebih ceria */
+        }
+        
+        .kids-mode .text-gradient {
+            background-image: linear-gradient(to right, #60a5fa, #3b82f6); /* Gradient lebih soft */
+        }
+
+        .kids-mode .hero-title-pulse span:first-child {
+             background-image: linear-gradient(to right, #f87171, #ef4444) !important;
+        }
+
+        .kids-mode .hero-title-pulse span:last-child {
+             background-image: linear-gradient(to right, #a78bfa, #8b5cf6) !important;
+        }
+
+        .kids-mode .virus-bg-overlay {
+            opacity: 0.08; /* Sedikit lebih jelas di mode anak */
+            background-size: 100px; /* Ukuran lebih kecil */
+            animation: virus-spin 20s linear infinite; /* Animasi berputar */
+        }
+
+        @keyframes virus-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <!-- Background Overlay Virus HIV --><div class="virus-bg-overlay"></div>
+
+    <!-- Header / Navigasi --><header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200">
+        <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo --><a href="#" class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold text-transparent bg-gradient-to-r from-cyan-500 to-blue-600 text-gradient">InfoSehat+</span>
+                </a>
+                <!-- Menu Desktop --><div class="hidden sm:ml-6 sm:flex sm:space-x-8 items-center">
+                    <a href="#home" class="inline-flex items-center px-1 pt-1 border-b-2 border-blue-500 text-sm font-medium text-gray-900">Beranda</a>
+                    <a href="#hiv" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">HIV/AIDS</a>
+                    <a href="#napsza" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">NAPSZA</a>
+                    <a href="#bantuan" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">Cari Bantuan</a>
+                    <button id="kidsModeToggle" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 transition duration-300">
+                        Mode Anak
+                    </button>
+                </div>
+                <!-- Tombol Menu Mobile (implementasi JS tidak disertakan untuk kesederhanaan) --><div class="sm:hidden flex items-center">
+                    <button class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Konten Utama --><main>
+        <!-- 1. Hero Section --><section id="home" class="relative overflow-hidden">
+            <!-- INJEKSI LATAR BELAKANG TAMAN KARTUN SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 w-full h-full" style="z-index: 0;">
+                <defs>
+                    <!-- Gradasi Langit -->
+                    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#abdcff; stop-opacity:1" /> <!-- Biru Langit -->
+                        <stop offset="70%" style="stop-color:#d1f0ff; stop-opacity:1" /> <!-- Cakrawala Cerah -->
+                    </linearGradient>
+                    <!-- Matahari Halus -->
+                    <radialGradient id="sun" cx="80%" cy="20%" r="40%">
+                        <stop offset="0%" style="stop-color:rgba(255, 253, 224, 0.9);" />
+                        <stop offset="100%" style="stop-color:rgba(255, 253, 224, 0);" />
+                    </radialGradient>
+                    <!-- Gradasi Bukit 1 -->
+                    <linearGradient id="hill1" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#76c893;" />
+                        <stop offset="100%" style="stop-color:#52b69a;" />
+                    </linearGradient>
+                     <!-- Gradasi Bukit 2 -->
+                     <linearGradient id="hill2" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#46a094;" />
+                        <stop offset="100%" style="stop-color:#348a7b;" />
+                    </linearGradient>
+                </defs>
+                <!-- Gambar Langit -->
+                <rect width="100" height="100" fill="url(#sky)" />
+                <!-- Gambar Matahari -->
+                <rect width="100" height="100" fill="url(#sun)" />
+                <!-- Gambar Perbukitan -->
+                <path d="M-5 80 Q 25 60, 50 80 T 100 75 L 105 105 L -5 105 Z" fill="url(#hill1)" opacity="0.8" />
+                <path d="M-5 85 Q 35 70, 60 85 T 105 80 L 105 105 L -5 105 Z" fill="url(#hill2)" />
+            </svg>
+            <!-- AKHIR INJEKSI LATAR BELAKANG -->
+
+            <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 sm:pt-32 sm:pb-24">
+                <div class_G="text-center">
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900">
+                        <span class="block hero-title-pulse">Memahami <span class="text-transparent bg-gradient-to-r from-red-500 to-pink-600 text-gradient">HIV/AIDS</span></span>
+                        <span class="block"> & <span class="text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 text-gradient">NAPSZA</span></span>
+                    </h1>
+                    <p class="mt-4 sm:mt-6 max-w-2xl mx-auto text-lg sm:text-xl text-gray-600" data-adult-text="Informasi yang jelas, empatik, dan terpercaya untuk semua usia. Mari peduli, mari pahami." data-kids-text="Yuk, kita belajar bareng tentang 'Hacks' kesehatan dan 'musuh-musuh' tubuh kita biar tetap 'level up'!">
+                        Informasi yang jelas, empatik, dan terpercaya untuk semua usia. Mari peduli, mari pahami.
+                    </p>
+                    <div class="mt-8 sm:mt-10 flex flex-wrap justify-center gap-4">
+                        <a href="#hiv" class="inline-block px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition duration-300 shadow-lg">
+                            Pelajari HIV/AIDS
+                        </a>
+                        <a href="#napsza" class="inline-block px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 transform hover:scale-105 transition duration-300 shadow-lg">
+                            Kenali NAPSZA
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Elemen dekoratif blur DIHAPUS, diganti SVG di atas -->
+            <!-- <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gray-50" aria-hidden="true"></div> -->
+            <!-- <div class="absolute top-0 left-0 -translate-x-1/4 -translate-y-1/4 w-96 h-96 bg-cyan-100 rounded-full opacity-30 blur-3xl" aria-hidden="true"></div> -->
+            <!-- <div class="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 w-96 h-96 bg-red-100 rounded-full opacity-30 blur-3xl" aria-hidden="true"></div> -->
+        </section>
+
+        <!-- 2. Seksi HIV/AIDS -->
+        <!-- HAPUS 'bg-gray-50' agar background body terlihat -->
+        <section id="hiv" class="py-16 sm:py-24">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center animate-on-scroll">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900" data-adult-text="Fakta Lengkap HIV/AIDS" data-kids-text="Mengenal 'Virus Gamer' HIV/AIDS">
+                        Fakta Lengkap <span class="text-red-600">HIV/AIDS</span>
+                    </h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600" data-adult-text="Mengetahui adalah langkah pertama untuk melindungi diri sendiri dan orang lain." data-kids-text="Yuk, kenalan sama virus HIV, biar kita tahu cara 'ngalahinnya' dan jaga 'HP' (Health Point) kita tetap penuh!">
+                        Mengetahui adalah langkah pertama untuk melindungi diri sendiri dan orang lain.
+                    </p>
+                </div>
+                
+                <!-- Accordion untuk Info HIV --><div class="mt-12 max-w-3xl mx-auto space-y-4">
+                    <!-- Item 1 --><div class="accordion-item bg-white rounded-lg shadow-md overflow-hidden animate-on-scroll" style="transition-delay: 100ms;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left px-6 py-4">
+                            <span class="text-lg font-medium text-gray-800" data-adult-text="Apa itu HIV dan AIDS?" data-kids-text="Siapa Itu HIV & AIDS? (Bukan Player Jago, tapi Virus!)">Apa itu HIV dan AIDS?</span>
+                            <svg class="accordion-icon w-6 h-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-6 border-t border-gray-200 text-gray-700">
+                                <p data-adult-text="<strong>HIV (Human Immunodeficiency Virus)</strong> adalah virus yang menyerang sistem kekebalan tubuh, khususnya sel CD4 (sel T), yang membantu tubuh melawan infeksi. <strong>AIDS (Acquired Immunodeficiency Syndrome)</strong> adalah kondisi stadium akhir dari infeksi HIV, di mana sistem kekebalan tubuh sudah sangat rusak sehingga rentan terhadap berbagai infeksi oportunistik dan kanker. Penting diingat: Seseorang yang terinfeksi HIV tidak otomatis berarti menderita AIDS. Dengan pengobatan yang tepat, banyak orang dengan HIV dapat hidup sehat dan tidak pernah sampai ke tahap AIDS."
+                                   data-kids-text="Bayangkan tubuh kita itu kayak game di Roblox. Ada karakter jagoan kita, yaitu sistem imun (daya tahan tubuh) yang siap lawan semua 'musuh' virus dan bakteri. Nah, <strong>HIV</strong> itu kayak 'virus komputer' jahat yang nyerang sistem imun kita, terutama 'player' penting bernama sel CD4. Kalau sistem imun kita rusak parah banget, nah itu baru namanya <strong>AIDS</strong>. Jadi, AIDS itu kayak 'game over' buat sistem imun kita. Tapi jangan takut! Walaupun kena HIV, bukan berarti langsung AIDS. Kalau minum 'potion' obat (namanya ARV) rutin, kita bisa tetap main game dengan 'HP' yang stabil dan hidup normal! HIV itu bukan akhir dari segalanya, kok.">
+                                <p><strong>HIV (Human Immunodeficiency Virus)</strong> adalah virus yang menyerang sistem kekebalan tubuh, khususnya sel CD4 (sel T), yang membantu tubuh melawan infeksi.</p>
+                                <p class="mt-2"><strong>AIDS (Acquired Immunodeficiency Syndrome)</strong> adalah kondisi stadium akhir dari infeksi HIV, di mana sistem kekebalan tubuh sudah sangat rusak sehingga rentan terhadap berbagai infeksi oportunistik dan kanker.</p>
+                                <p class="mt-2">Penting diingat: Seseorang yang terinfeksi HIV tidak otomatis berarti menderita AIDS. Dengan pengobatan yang tepat, banyak orang dengan HIV dapat hidup sehat dan tidak pernah sampai ke tahap AIDS.</p>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 2 --><div class="accordion-item bg-white rounded-lg shadow-md overflow-hidden animate-on-scroll" style="transition-delay: 200ms;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left px-6 py-4">
+                            <span class="text-lg font-medium text-gray-800" data-adult-text="Bagaimana HIV Menular?" data-kids-text="Gimana 'Virus Gamer' HIV Ini Bisa 'Share Link'?">Bagaimana HIV Menular?</span>
+                            <svg class="accordion-icon w-6 h-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-6 border-t border-gray-200 text-gray-700 space-y-2">
+                                <p data-adult-text="HIV hanya menular melalui cairan tubuh tertentu: Darah, Air mani (sperma), Cairan pra-ejakulasi, Cairan rektal, Cairan vagina, Air Susu Ibu (ASI). Penularan utama terjadi melalui: <strong>Hubungan seksual tanpa kondom</strong> dengan orang yang terinfeksi HIV. <strong>Berbagi jarum suntik</strong> atau alat suntik lainnya (sering terkait penggunaan NAPSZA suntik). <strong>Dari ibu ke bayi</strong> selama kehamilan, persalinan, atau menyusui. Transfusi darah yang terkontaminasi (sangat jarang terjadi saat ini)."
+                                   data-kids-text="Virus HIV ini itu pemalu banget! Dia cuma mau 'share link' (menular) lewat cairan-cairan tubuh yang khusus banget, kayak darah, cairan 'rahasia' cowok dan cewek, atau dari ibu ke bayinya. Jadi, HIV itu bukan kayak virus flu yang bisa nyebar dari batuk atau bersin ya! Paling sering menular kalau:
+                                <ul class='list-disc list-inside pl-4 mt-2'>
+                                    <li>Ada 'mabar' (main bareng) hubungan dewasa tanpa pelindung.</li>
+                                    <li>'Pinjam-pinjaman' jarum suntik buat 'nge-cheat' (pakai narkoba suntik) yang bahaya banget!</li>
+                                    <li>Dari 'Mama Player' ke 'Baby Player' pas hamil, lahir, atau menyusui (tapi ini bisa dicegah!).</li>
+                                </ul>">
+                                <p>HIV hanya menular melalui cairan tubuh tertentu:</p>
+                                <ul class="list-disc list-inside pl-4">
+                                    <li>Darah</li>
+                                    <li>Air mani (sperma)</li>
+                                    <li>Cairan pra-ejakulasi</li>
+                                    <li>Cairan rektal</li>
+                                    <li>Cairan vagina</li>
+                                    <li>Air Susu Ibu (ASI)</li>
+                                </ul>
+                                <p>Penularan utama terjadi melalui:</p>
+                                <ul class="list-disc list-inside pl-4">
+                                    <li><strong>Hubungan seksual tanpa kondom</strong> dengan orang yang terinfeksi HIV.</li>
+                                    <li><strong>Berbagi jarum suntik</strong> atau alat suntik lainnya (sering terkait penggunaan NAPSZA suntik).</li>
+                                    <li><strong>Dari ibu ke bayi</strong> selama kehamilan, persalinan, atau menyusui.</li>
+                                    <li>Transfusi darah yang terkontaminasi (sangat jarang terjadi saat ini).</li>
+                                </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 --><div class="accordion-item bg-white rounded-lg shadow-md overflow-hidden animate-on-scroll" style="transition-delay: 300ms;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left px-6 py-4">
+                            <span class="text-lg font-medium text-gray-800" data-adult-text="HIV TIDAK Menular Melalui..." data-kids-text="HIV GAK Bisa 'Share Link' Kalau Cuma...">HIV TIDAK Menular Melalui...</span>
+                            <svg class="accordion-icon w-6 h-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-6 border-t border-gray-200 text-gray-700">
+                                <p data-adult-text="Penting untuk meluruskan misinformasi. HIV TIDAK menular melalui: Udara atau air, Gigitan nyamuk atau serangga, Berjabat tangan, berpelukan, atau ciuman pipi, Berbagi toilet, piring, atau alat makan, Keringat atau air liur, Berenang di kolam renang yang sama."
+                                   data-kids-text="Nah, ini dia hal-hal yang bikin kita sering salah paham! HIV itu <strong>NGGAK</strong> bisa 'share link' (menular) cuma karena:
+                                <ul class='list-disc list-inside pl-4 mt-2'>
+                                    <li>Nafas atau udara yang kita hirup (bukan virus TikTok!).</li>
+                                    <li>Digigit nyamuk atau serangga (nyamuk bukan 'hacker' yang nyebarin virus!).</li>
+                                    <li>Toss, pelukan, atau cium pipi (ini kontak biasa, bukan 'transfer data').</li>
+                                    <li>Pinjam-pinjaman toilet, piring, atau sendok garpu.</li>
+                                    <li>Keringat atau ludah (kecuali ada luka berdarah ya).</li>
+                                    <li>Berenang bareng di kolam renang (air kolam bukan 'server' virus).</li>
+                                </ul>
+                                Jadi, jangan takut berteman sama orang yang kena HIV ya, mereka juga butuh teman!">
+                                <p>Penting untuk meluruskan misinformasi. HIV <strong>TIDAK</strong> menular melalui:</p>
+                                <ul class="list-disc list-inside pl-4 space-y-1 mt-2">
+                                    <li>Udara atau air</li>
+                                    <li>Gigitan nyamuk atau serangga</li>
+                                    <li>Berjabat tangan, berpelukan, atau ciuman pipi</li>
+                                    <li>Berbagi toilet, piring, atau alat makan</li>
+                                    <li>Keringat atau air liur</li>
+                                    <li>Berenang di kolam renang yang sama</li>
+                                </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 4 --><div class="accordion-item bg-white rounded-lg shadow-md overflow-hidden animate-on-scroll" style="transition-delay: 400ms;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left px-6 py-4">
+                            <span class="text-lg font-medium text-gray-800" data-adult-text="Pencegahan, Tes, dan Pengobatan" data-kids-text="'Cheat Code' Biar Gak Kena HIV & Cara 'Ngobatinnya'">Pencegahan, Tes, dan Pengobatan</span>
+                            <svg class="accordion-icon w-6 h-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-6 border-t border-gray-200 text-gray-700 space-y-3">
+                                <p data-adult-text="<strong>Pencegahan (ABCDE):</strong> <strong>A</strong> (Abstinence): Tidak melakukan hubungan seks. <strong>B</strong> (Be Faithful): Saling setia pada satu pasangan. <strong>C</strong> (Condom): Gunakan kondom secara konsisten. <strong>D</strong> (Drug No): Tidak menggunakan NAPSZA, terutama suntik. <strong>E</strong> (Education): Edukasi diri dengan informasi yang benar. <strong>Tes HIV (VCT):</strong> Satu-satunya cara mengetahui status HIV adalah dengan tes. Tes ini bersifat sukarela, rahasia, dan didahului konseling. <strong>Pengobatan (ARV):</strong> Meskipun belum bisa disembuhkan, HIV dapat dikendalikan dengan obat <strong>Antiretroviral (ARV)</strong>. ARV menekan jumlah virus dalam tubuh sehingga sistem kekebalan tubuh pulih dan ODHIV (Orang Dengan HIV) dapat hidup sehat dan produktif."
+                                   data-kids-text="Supaya kita 'level up' terus dan gak kena 'virus gamer' HIV, ini dia 'cheat code' atau caranya:
+                                <ul class='list-none pl-4 space-y-1 mt-2'>
+                                    <li><strong>A</strong> (Abstinence): Belum waktunya main 'game' hubungan dewasa.</li>
+                                    <li><strong>B</strong> (Be Faithful): Kalau nanti sudah dewasa dan punya pasangan, setia itu penting banget.</li>
+                                    <li><strong>C</strong> (Condom): Kalau main 'game' hubungan dewasa, pakai 'pelindung' namanya kondom.</li>
+                                    <li><strong>D</strong> (Drug No): Jangan pernah coba-coba 'nge-cheat' pakai NAPSZA atau narkoba, apalagi yang suntik! Bahaya banget dan bisa bikin kena HIV.</li>
+                                    <li><strong>E</strong> (Education): Terus belajar dan cari tahu info yang benar kayak sekarang ini!</li>
+                                </ul>
+                                <p class='mt-2'><strong>Cara Cek Status HIV:</strong> Satu-satunya cara biar tahu kita kena virus HIV atau enggak itu dengan 'cek status' (tes HIV). Ini kayak ngecek 'profile' di game, tapi yang ini rahasia dan aman kok.</p>
+                                <p class='mt-2'><strong>Obat HIV (ARV):</strong> HIV itu belum ada 'ramuan super' yang bisa nyembuhin, tapi ada 'potion' obat namanya <strong>ARV</strong>. Kalau diminum rutin, virusnya jadi 'lemah' dan gak bisa nyerang sistem imun kita lagi. Jadi, yang kena HIV bisa tetap 'hidup normal' dan main game sampai tua!</p>">
+                                <p><strong>Pencegahan (ABCDE):</strong></p>
+                                <ul class="list-none pl-4 space-y-1">
+                                    <li><strong>A</strong> (Abstinence): Tidak melakukan hubungan seks.</li>
+                                    <li><strong>B</strong> (Be Faithful): Saling setia pada satu pasangan.</li>
+                                    <li><strong>C</strong> (Condom): Gunakan kondom secara konsisten.</li>
+                                    <li><strong>D</strong> (Drug No): Tidak menggunakan NAPSZA, terutama suntik.</li>
+                                    <li><strong>E</strong> (Education): Edukasi diri dengan informasi yang benar.</li>
+                                </ul>
+                                <p><strong>Tes HIV (VCT):</strong> Satu-satunya cara mengetahui status HIV adalah dengan tes. Tes ini bersifat sukarela, rahasia, dan didahului konseling.</p>
+                                <p><strong>Pengobatan (ARV):</strong> Meskipun belum bisa disembuhkan, HIV dapat dikendalikan dengan obat <strong>Antiretroviral (ARV)</strong>. ARV menekan jumlah virus dalam tubuh sehingga sistem kekebalan tubuh pulih dan ODHIV (Orang Dengan HIV) dapat hidup sehat dan produktif.</p>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Seksi NAPSZA -->
+        <!-- HAPUS 'bg-white' agar background body terlihat -->
+        <section id="napsza" class="py-16 sm:py-24">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center animate-on-scroll">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900" data-adult-text="Mengenal Bahaya NAPSZA" data-kids-text="Waspada 'Item Bug' NAPSZA (Narkoba)!">
+                        Mengenal Bahaya <span class="text-indigo-600">NAPSZA</span>
+                    </h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600" data-adult-text="NAPSZA (Narkotika, Psikotropika, dan Zat Adiktif lainnya) dapat merusak masa depan." data-kids-text="NAPSZA itu kayak 'item bug' atau 'cheat' terlarang di game yang bisa bikin karakter kita rusak parah dan gak bisa main lagi. Jauhi ya!">
+                        NAPSZA (Narkotika, Psikotropika, dan Zat Adiktif lainnya) dapat merusak masa depan.
+                    </p>
+                </div>
+                
+                <!-- Grid Card untuk Jenis NAPSZA --><div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Card 1: Narkotika --><div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition duration-300 animate-on-scroll" style="transition-delay: 100ms;">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-indigo-700" data-adult-text="Narkotika" data-kids-text="Narkotika (Si 'Poison Potion')">Narkotika</h3>
+                            <p class="mt-2 text-gray-600" data-adult-text="Zat atau obat yang berasal dari tanaman atau bukan, yang dapat menyebabkan penurunan atau perubahan kesadaran, hilangnya rasa, mengurangi sampai menghilangkan rasa nyeri, dan dapat menimbulkan ketergantungan." data-kids-text="Ini kayak 'potion beracun' yang bikin kita mabuk, gak sadar diri, dan jadi sering sakit. Kalau sudah coba, susah banget lepasnya, kayak 'game' yang bikin ketagihan!">Zat atau obat yang berasal dari tanaman atau bukan, yang dapat menyebabkan penurunan atau perubahan kesadaran, hilangnya rasa, mengurangi sampai menghilangkan rasa nyeri, dan dapat menimbulkan ketergantungan.</p>
+                            <p class="mt-2 text-sm font-medium text-gray-500" data-adult-text="Contoh: Heroin, Kokain, Ganja." data-kids-text="Contoh: Heroin, Kokain, Ganja.">Contoh: Heroin, Kokain, Ganja.</p>
+                        </div>
+                    </div>
+                    <!-- Card 2: Psikotropika --><div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition duration-300 animate-on-scroll" style="transition-delay: 200ms;">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-indigo-700" data-adult-text="Psikotropika" data-kids-text="Psikotropika (Si 'Mind Control Item')">Psikotropika</h3>
+                            <p class="mt-2 text-gray-600" data-adult-text="Zat atau obat, baik alamiah maupun sintetis, yang berkhasiat psikoaktif melalui pengaruh selektif pada susunan saraf pusat yang menyebabkan perubahan khas pada aktivitas mental dan perilaku." data-kids-text="Ini kayak 'item' yang bisa bikin otak kita jadi aneh, pikiran jadi kacau, dan kelakuan kita bisa berubah drastis. Bahaya banget buat masa depan kita!">Zat atau obat, baik alamiah maupun sintetis, yang berkhasiat psikoaktif melalui pengaruh selektif pada susunan saraf pusat yang menyebabkan perubahan khas pada aktivitas mental dan perilaku.</p>
+                            <p class="mt-2 text-sm font-medium text-gray-500" data-adult-text="Contoh: Ekstasi, Sabu, Obat penenang." data-kids-text="Contoh: Ekstasi, Sabu, Obat penenang.">Contoh: Ekstasi, Sabu, Obat penenang.</p>
+                        </div>
+                    </div>
+                    <!-- Card 3: Zat Adiktif Lainnya --><div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition duration-300 animate-on-scroll" style="transition-delay: 300ms;">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-indigo-700" data-adult-text="Zat Adiktif Lainnya" data-kids-text="Zat Adiktif Lainnya (Bukan 'Power Up' Sehat!)">Zat Adiktif Lainnya</h3>
+                            <p class="mt-2 text-gray-600" data-adult-text="Bahan atau zat lain (selain narkotika dan psikotropika) yang penggunaannya dapat menimbulkan ketergantungan fisik atau psikologis. Seringkali tidak diatur dalam UU Narkotika/Psikotropika." data-kids-text="Ini kayak 'item' lain yang bikin kita ketagihan banget, meskipun kadang gak sebahaya narkotika dan psikotropika. Contohnya kayak rokok atau minuman beralkohol. Awalnya cuma coba, tapi nanti jadi susah berhenti. Gak ada untungnya buat 'level up'!">Bahan atau zat lain (selain narkotika dan psikotropika) yang penggunaannya dapat menimbulkan ketergantungan fisik atau psikologis. Seringkali tidak diatur dalam UU Narkotika/Psikotropika.</p>
+                            <p class="mt-2 text-sm font-medium text-gray-500" data-adult-text="Contoh: Alkohol, Nikotin (Rokok), Kafein." data-kids-text="Contoh: Alkohol, Nikotin (Rokok), Kafein.">Contoh: Alkohol, Nikotin (Rokok), Kafein.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion untuk Info NAPSZA --><div class="mt-12 max-w-3xl mx-auto space-y-4">
+                    <!-- Item 5 --><div class="accordion-item bg-white rounded-lg shadow-md overflow-hidden animate-on-scroll" style="transition-delay: 400ms;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left px-6 py-4">
+                            <span class="text-lg font-medium text-gray-800" data-adult-text="Dampak & Bahaya Penyalahgunaan" data-kids-text="'Damage' & Bahaya Pakai NAPSZA">Dampak & Bahaya Penyalahgunaan</span>
+                            <svg class="accordion-icon w-6 h-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-6 border-t border-gray-200 text-gray-700 space-y-3">
+                                <p data-adult-text="Penyalahgunaan NAPSZA berdampak buruk pada: <strong>Kesehatan Fisik:</strong> Kerusakan organ (hati, otak, jantung), overdosis, kematian, dan risiko tertular HIV/Hepatitis C (akibat berbagi jarum suntik). <strong>Kesehatan Mental:</strong> Depresi, kecemasan, psikosis, paranoia, perubahan kepribadian. <strong>Sosial & Ekonomi:</strong> Hubungan keluarga rusak, kehilangan pekerjaan, masalah keuangan, kriminalitas. <strong>Hukum:</strong> Terjerat masalah hukum pidana."
+                                   data-kids-text="Kalau pakai NAPSZA, ini dia 'damage' atau kerugian yang bisa kita alami:
+                                <ul class='list-disc list-inside pl-4 mt-2'>
+                                    <li><strong>HP (Health Point) Jadi Rusak:</strong> Organ tubuh kita (hati, otak, jantung) bisa rusak, bahkan bisa 'game over' (meninggal) karena overdosis. Dan kalau pinjam-pinjaman jarum suntik, bisa kena HIV juga!</li>
+                                    <li><strong>Pikiran Kacau:</strong> Bisa jadi sedih terus, gampang cemas, atau jadi gak percaya sama orang.</li>
+                                    <li><strong>Hidup Sosial Hancur:</strong> Keluarga jadi marah, teman-teman menjauh, dan uang juga bisa habis buat beli NAPSZA.</li>
+                                    <li><strong>Kena Banned (Hukum):</strong> Bisa berurusan sama polisi dan dipenjara. Siapa mau, coba?</li>
+                                </ul>">
+                                <p>Penyalahgunaan NAPSZA berdampak buruk pada:</p>
+                                <ul class="list-disc list-inside pl-4">
+                                    <li><strong>Kesehatan Fisik:</strong> Kerusakan organ (hati, otak, jantung), overdosis, kematian, dan risiko tertular HIV/Hepatitis C (akibat berbagi jarum suntik).</li>
+                                    <li><strong>Kesehatan Mental:</strong> Depresi, kecemasan, psikosis, paranoia, perubahan kepribadian.</li>
+                                    <li><strong>Sosial & Ekonomi:</strong> Hubungan keluarga rusak, kehilangan pekerjaan, masalah keuangan, kriminalitas.</li>
+                                    <li><strong>Hukum:</strong> Terjerat masalah hukum pidana.</li>
+                                </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 6 --><div class="accordion-item bg-white rounded-lg shadow-md overflow-hidden animate-on-scroll" style="transition-delay: 500ms;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left px-6 py-4">
+                            <span class="text-lg font-medium text-gray-800" data-adult-text="Pemulihan & Rehabilitasi" data-kids-text="Cara 'Ngedit Kembali' Hidup Kita (Rehabilitasi)">Pemulihan & Rehabilitasi</span>
+                            <svg class="accordion-icon w-6 h-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-6 border-t border-gray-200 text-gray-700">
+                                <p data-adult-text="Kecanduan adalah penyakit kronis yang dapat dipulihkan. Pemulihan adalah proses jangka panjang yang mungkin membutuhkan: <strong>Detoksifikasi:</strong> Proses mengeluarkan zat dari tubuh di bawah pengawasan medis. <strong>Rehabilitasi:</strong> Program (rawat inap atau jalan) yang mencakup terapi, konseling, dan edukasi untuk mengubah perilaku. <strong>Dukungan Kelompok:</strong> Berbagi pengalaman dengan orang lain yang memiliki masalah serupa (misal: Narcotics Anonymous). Mencari bantuan adalah tanda kekuatan, bukan kelemahan."
+                                   data-kids-text="Kalau ada teman atau keluarga yang sudah terlanjur pakai NAPSZA, jangan dimusuhi ya! Mereka bisa 'ngedit kembali' hidup mereka. Caranya:
+                                <ul class='list-disc list-inside pl-4 mt-2'>
+                                    <li><strong>Detoks (Bersih-bersih Tubuh):</strong> Ini kayak 'reset' ulang tubuh kita di rumah sakit biar bersih dari zat-zat jahat.</li>
+                                    <li><strong>Rehabilitasi (Sekolah Hidup Baru):</strong> Di sini kita diajarin cara hidup sehat, ngobrol sama psikolog, dan belajar biar gak balik lagi ke NAPSZA.</li>
+                                    <li><strong>Grup Dukungan (Tim Solid):</strong> Gabung sama teman-teman lain yang punya masalah sama, jadi bisa saling nguatin dan kasih semangat.</li>
+                                </ul>
+                                Inget, minta bantuan itu bukan berarti lemah, tapi itu berarti kamu 'player' yang kuat dan berani 'level up' lagi!">
+                                <p>Kecanduan adalah penyakit kronis yang dapat dipulihkan. Pemulihan adalah proses jangka panjang yang mungkin membutuhkan:</p>
+                                <ul class="list-disc list-inside pl-4 mt-2">
+                                    <li><strong>Detoksifikasi:</strong> Proses mengeluarkan zat dari tubuh di bawah pengawasan medis.</li>
+                                    <li><strong>Rehabilitasi:</strong> Program (rawat inap atau jalan) yang mencakup terapi, konseling, dan edukasi untuk mengubah perilaku.</li>
+                                    <li><strong>Dukungan Kelompok:</strong> Berbagi pengalaman dengan orang lain yang memiliki masalah serupa (misal: Narcotics Anonymous).</li>
+                                </ul>
+                                <p class="mt-2">Mencari bantuan adalah tanda kekuatan, bukan kelemahan.</p>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Seksi Keterkaitan & Bantuan -->
+        <!-- HAPUS 'bg-gradient-to-b from-gray-50 to-white' agar background body terlihat -->
+        <section id="bantuan" class="py-16 sm:py-24">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Box Keterkaitan --><div class="bg-blue-100 border-l-4 border-blue-500 p-6 rounded-lg shadow-lg animate-on-scroll">
+                    <h3 class="text-2xl font-bold text-blue-900" data-adult-text="Keterkaitan HIV & NAPSZA" data-kids-text="Hubungan Antara 'Virus Gamer' HIV & 'Item Bug' NAPSZA">Keterkaitan HIV & NAPSZA</h3>
+                    <p class="mt-2 text-blue-800" data-adult-text="Penggunaan NAPSZA, khususnya melalui jarum suntik yang digunakan bersama, merupakan salah satu faktor risiko tertinggi penularan HIV. Selain itu, penggunaan zat dapat menurunkan kesadaran sehingga meningkatkan risiko perilaku seksual tidak aman (tanpa kondom)."
+                       data-kids-text="Nah, ini penting banget! Kalau ada yang pakai 'item bug' NAPSZA, apalagi yang pakai suntik terus jarumnya pinjam-pinjaman, itu bisa jadi 'jalan tol' buat 'virus gamer' HIV nyebar ke tubuh lain. Selain itu, kalau pikiran kita kacau karena NAPSZA, kita jadi gampang lupa sama 'pelindung' (kondom) saat 'mabar' hubungan dewasa, yang juga bikin HIV makin gampang nular.">Penggunaan NAPSZA, khususnya melalui jarum suntik yang digunakan bersama, merupakan salah satu faktor risiko tertinggi penularan HIV. Selain itu, penggunaan zat dapat menurunkan kesadaran sehingga meningkatkan risiko perilaku seksual tidak aman (tanpa kondom).</p>
+                </div>
+
+                <!-- Box Cari Bantuan --><div class="mt-12 text-center animate-on-scroll" style="transition-delay: 200ms;">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900" data-adult-text="Anda Tidak Sendirian" data-kids-text="Kamu Gak Sendirian, Ada Banyak 'Supporter'!">Anda Tidak Sendirian</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600" data-adult-text="Jika Anda atau seseorang yang Anda kenal membutuhkan bantuan terkait HIV, NAPSZA, atau kesehatan mental, jangan ragu untuk menghubungi layanan di bawah ini (contoh):" data-kids-text="Kalau kamu atau ada teman/keluarga yang butuh bantuan soal HIV, NAPSZA, atau lagi sedih, jangan malu ya! Ada banyak 'supporter' yang siap bantu, kayak ini (contoh):">
+                        Jika Anda atau seseorang yang Anda kenal membutuhkan bantuan terkait HIV, NAPSZA, atau kesehatan mental, jangan ragu untuk menghubungi layanan di bawah ini (contoh):
+                    </p>
+                    <div class="mt-8 space-y-4 max-w-lg mx-auto">
+                        <div class="bg-white p-5 rounded-lg shadow-md border border-gray-200">
+                            <h4 class="font-semibold text-lg text-gray-800" data-adult-text="Layanan Konseling HIV (VCT)" data-kids-text="Tempat 'Cek Status' HIV (Gratis & Rahasia!)">Layanan Konseling HIV (VCT)</h4>
+                            <p class="text-gray-600" data-adult-text="Kunjungi Puskesmas atau Rumah Sakit terdekat untuk layanan VCT yang rahasia dan profesional." data-kids-text="Pergi aja ke Puskesmas atau Rumah Sakit terdekat, bilang mau 'cek status' HIV. Nanti dibantu sama kakak-kakak yang baik, dan dijamin rahasia!">Kunjungi Puskesmas atau Rumah Sakit terdekat untuk layanan VCT yang rahasia dan profesional.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-md border border-gray-200">
+                            <h4 class="font-semibold text-lg text-gray-800" data-adult-text="Badan Narkotika Nasional (BNN)" data-kids-text="'Basecamp' Bantuan Narkoba (BNN)">Badan Narkotika Nasional (BNN)</h4>
+                            <p class="text-gray-600" data-adult-text="Hubungi (021) 123-4567 atau kunjungi <span class='text-blue-600 font-medium'>bnn.go.id</span> untuk info rehabilitasi." data-kids-text="Telepon mereka di (021) 123-4567 atau buka website mereka di <span class='text-blue-600 font-medium'>bnn.go.id</span>. Mereka punya program 'pemulihan' yang keren banget!">Hubungi (021) 123-4567 atau kunjungi <span class="text-blue-600 font-medium">bnn.go.id</span> untuk info rehabilitasi.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-md border border-gray-200">
+                            <h4 class="font-semibold text-lg text-gray-800" data-adult-text="Komunitas Pendukung" data-kids-text="'Guild' atau Komunitas Teman Sehat">Komunitas Pendukung</h4>
+                            <p class="text-gray-600" data-adult-text="Cari komunitas peduli AIDS atau kelompok dukungan sebaya (peer support) di kota Anda." data-kids-text="Coba cari 'guild' atau komunitas teman-teman peduli HIV atau yang bantu pecandu NAPSZA di kotamu. Mereka siap jadi 'tim' kamu!">Cari komunitas peduli AIDS atau kelompok dukungan sebaya (peer support) di kota Anda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer --><footer class="bg-gray-800 text-gray-300">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p>&copy; 2025 InfoSehat+. Dibuat untuk tujuan edukasi.</p>
+                <p class="text-sm text-gray-400 mt-1">Informasi di situs ini tidak menggantikan nasihat medis profesional.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript untuk Animasi dan Mode Anak --><script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Logika Accordion
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    
+                    // Toggle 'active' class pada tombol
+                    button.classList.toggle('active');
+                    
+                    // Tampilkan atau sembunyikan konten
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        // Atur maxHeight ke scrollHeight agar animasi mulus
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }
+                });
+            });
+
+            // 2. Logika Animasi Saat Scroll (Intersection Observer)
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target); // Animasi hanya sekali
+                        }
+                    });
+                }, {
+                    threshold: 0.1 // Muncul saat 10% elemen terlihat
+                });
+
+                animatedElements.forEach(el => {
+                    observer.observe(el);
+                });
+            } else {
+                // Fallback untuk browser lama (tampilkan semua)
+                animatedElements.forEach(el => {
+                    el.classList.add('is-visible');
+                });
+            }
+
+            // 3. Logika Mode Anak
+            const kidsModeToggle = document.getElementById('kidsModeToggle');
+            const body = document.body;
+            let isKidsMode = false; // Status mode anak
+
+            function applyKidsMode(enable) {
+                if (enable) {
+                    body.classList.add('kids-mode');
+                    kidsModeToggle.textContent = 'Mode Dewasa';
+                    kidsModeToggle.classList.remove('bg-blue-100', 'hover:bg-blue-200');
+                    kidsModeToggle.classList.add('bg-pink-100', 'hover:bg-pink-200', 'text-pink-700');
+                } else {
+                    body.classList.remove('kids-mode');
+                    kidsModeToggle.textContent = 'Mode Anak';
+                    kidsModeToggle.classList.remove('bg-pink-100', 'hover:bg-pink-200', 'text-pink-700');
+                    kidsModeToggle.classList.add('bg-blue-100', 'hover:bg-blue-200');
+                }
+
+                // Ganti teks berdasarkan mode
+                document.querySelectorAll('[data-adult-text]').forEach(element => {
+                    if (enable) {
+                        element.innerHTML = element.dataset.kidsText;
+                    } else {
+                        element.innerHTML = element.dataset.adultText;
+                    }
+                });
+            }
+
+            // Cek status mode anak dari localStorage saat halaman dimuat
+            if (localStorage.getItem('isKidsMode') === 'true') {
+                isKidsMode = true;
+                applyKidsMode(true);
+            }
+
+            kidsModeToggle.addEventListener('click', () => {
+                isKidsMode = !isKidsMode;
+                applyKidsMode(isKidsMode);
+                localStorage.setItem('isKidsMode', isKidsMode); // Simpan status
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+
